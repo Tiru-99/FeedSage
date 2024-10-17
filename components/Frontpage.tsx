@@ -97,11 +97,19 @@ export default function HomePage() {
             </motion.p>
             <motion.div variants={fadeInUp}>
               {isSignedIn ? (
-                <Link href="/userprompt">
-                  <Button className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-8 py-3 rounded-full text-lg">
-                    Start Your Journey
-                  </Button>
-                </Link>
+                <>
+                  <Link href="/userprompt">
+                    <Button className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-8 py-3 rounded-full text-lg">
+                      Start Your Journey
+                    </Button>
+                  </Link>
+                  {/* Success message after login */}
+                  <div className="mt-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg">
+                    <p className="font-semibold">
+                      🎉 You are successfully logged in!
+                    </p>
+                  </div>
+                </>
               ) : (
                 <Link href="/sign-in">
                   <Button className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-8 py-3 rounded-full text-lg">

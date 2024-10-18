@@ -211,7 +211,7 @@ import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import axios from "axios"
 import { ThumbsUp, MessageCircle, Share2, Flag, ChevronDown, ChevronUp } from "lucide-react"
-
+import { SignedOut ,RedirectToSignIn } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -393,6 +393,9 @@ export default function VideoPage() {
           </div>
         </div>
       </div>
+      <SignedOut>
+        <RedirectToSignIn />
+      </SignedOut>
     </div>
   )
 }

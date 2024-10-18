@@ -4,9 +4,10 @@
 // import { Input } from "@/components/ui/input";
 // import axios from "axios";
 // import VideoCard from "@/components/VideoCard";
-// import { Youtube, Search, Menu, Bell, User } from "lucide-react";
-// import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/nextjs";
+// import { Youtube, Search, Menu, Bell, User, LogOut } from "lucide-react";
+// import { SignedIn,SignedOut, RedirectToSignIn, useClerk } from "@clerk/nextjs";
 // import Link from "next/link";
+// import { useRouter } from "next/navigation";
 
 // interface Video {
 //   id: string;
@@ -20,6 +21,8 @@
 //   const [searchQuery, setSearchQuery] = useState("");
 //   const [loading, setLoading] = useState(false);
 //   const [videos, setVideos] = useState<Video[]>([]);
+//   const { signOut } = useClerk();
+//   const router = useRouter(); // Initialize the router
 
 //   const fetchData = async (prompt: string) => {
 //     try {
@@ -37,6 +40,11 @@
 //     setLoading(true);
 //     fetchData(searchQuery);
 //   };
+//   const handleSignOut = async () => {
+//     await signOut();
+//     router.push("/");
+//   };
+  
 
 //   return (
 //     <div className="min-h-screen bg-gray-900 text-gray-100">
@@ -90,6 +98,14 @@
 //               >
 //                 <User className="h-6 w-6" />
 //               </Button>
+//               <Button
+//                 variant="ghost"
+//                 size="icon"
+//                 className="text-gray-300 hover:text-white ml-2"
+//                 onClick={handleSignOut} // Use the signOut handler
+//               >
+//                 <LogOut className="h-6 w-6" />
+//               </Button>
 //             </div>
 //           </div>
 //         </nav>
@@ -112,7 +128,7 @@
 //             <div className="text-center text-gray-400">
 //               Try searching to see some results!
 //             </div>
-//           )}
+//           )}  
 
 //           {loading && <div className="text-center">Loading...</div>}
 //         </div>
@@ -124,7 +140,6 @@
 //     </div>
 //   );
 // }
-
 "use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -132,9 +147,11 @@ import { Input } from "@/components/ui/input";
 import axios from "axios";
 import VideoCard from "@/components/VideoCard";
 import { Youtube, Search, Menu, Bell, User, LogOut } from "lucide-react";
-import { SignedIn, RedirectToSignIn, useClerk } from "@clerk/nextjs";
+import { SignedIn, SignedOut, useClerk } from "@clerk/nextjs";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+
 
 interface Video {
   id: string;
@@ -149,7 +166,7 @@ export default function Component() {
   const [loading, setLoading] = useState(false);
   const [videos, setVideos] = useState<Video[]>([]);
   const { signOut } = useClerk();
-  const router = useRouter(); // Initialize the router
+  const router = useRouter();
 
   const fetchData = async (prompt: string) => {
     try {
@@ -167,16 +184,24 @@ export default function Component() {
     setLoading(true);
     fetchData(searchQuery);
   };
+
   const handleSignOut = async () => {
-    await signOut();
-    router.push("/");
+    try {
+      await signOut();
+      // After signing out, explicitly navigate to the home page
+      router.push("/");
+      // Optional: Force a hard refresh to clear any cached states
+      router.refresh();
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
-  
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
       <SignedIn>
         <nav className="bg-gray-800 py-2 px-4 md:px-6 lg:px-8">
+          {/* ... rest of your nav content ... */}
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center">
               <Button
@@ -229,7 +254,7 @@ export default function Component() {
                 variant="ghost"
                 size="icon"
                 className="text-gray-300 hover:text-white ml-2"
-                onClick={handleSignOut} // Use the signOut handler
+                onClick={handleSignOut}
               >
                 <LogOut className="h-6 w-6" />
               </Button>
@@ -261,9 +286,38 @@ export default function Component() {
         </div>
       </SignedIn>
 
-      {/* <SignedOut>
-        <RedirectToSignIn />
-      </SignedOut> */}
+      {/* Remove RedirectToSignIn and handle unauthenticated state differently */}
+      <SignedOut>
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-primary/20 to-background">
+        <Card className="w-full max-w-md mx-4">
+          <CardHeader className="text-center space-y-1">
+            <CardTitle className="text-3xl font-bold">Welcome to FeedSage</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex justify-center">
+            <Youtube className="h-8 w-8 text-red-500 mr-2" />
+            <span className="text-xl font-bold">FeedSage</span>
+            </div>
+            <p className="text-center text-muted-foreground">
+              Your personal AI-powered feed curator and content discovery assistant.
+            </p>
+          </CardContent>
+          <CardFooter className="flex flex-col space-y-4">
+            <Link href="/sign-in" className="w-full">
+              <Button className="w-full" size="lg">
+                Sign In
+              </Button>
+            </Link>
+            <p className="text-sm text-center text-muted-foreground">
+              Don't have an account?{" "}
+              <Link href="/sign-up" className="underline underline-offset-2 hover:text-primary">
+                Sign up
+              </Link>
+            </p>
+          </CardFooter>
+        </Card>
+      </div>
+    </SignedOut>
     </div>
   );
 }
